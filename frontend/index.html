@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教育服务管理系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #1890ff;
+            --success: #52c41a;
+            --warning: #faad14;
+            --danger: #ff4d4f;
+            --bg-color: #f0f2f5;
+            --border-color: #e8e8e8;
+            --text-color: #333;
+            --text-secondary: #666;
+            --sidebar-width: 220px;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: var(--bg-color); color: var(--text-color); }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: var(--sidebar-width); background: #001529; color: #fff; position: fixed; height: 100vh; overflow-y: auto; }
+        .sidebar .logo { height: 64px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid #333; }
+        .sidebar .menu { padding: 10px 0; }
+        .sidebar .menu-item { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.3s; }
+        .sidebar .menu-item:hover { background: #1890ff; }
+        .sidebar .menu-item.active { background: #1890ff; }
+        .sidebar .menu-item svg { width: 18px; height: 18px; }
+        .main { flex: 1; margin-left: var(--sidebar-width); }
+        .header { height: 64px; background: #fff; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+        .header .user-info { display: flex; align-items: center; gap: 10px; }
+        .header .user-info .avatar { width: 36px; height: 36px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; }
+        .content { padding: 24px; }
+        .breadcrumb { margin-bottom: 16px; color: var(--text-secondary); }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .page-title { font-size: 24px; font-weight: 600; }
+        .card { background: #fff; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .search-form { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; padding: 20px; background: #fafafa; border-radius: 8px; }
+        .form-item { display: flex; align-items: center; gap: 8px; }
+        .form-item label { color: var(--text-secondary); white-space: nowrap; }
+        .form-item input, .form-item select { padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; outline: none; }
+        .form-item input:focus, .form-item select:focus { border-color: var(--primary); }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: #40a9ff; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-success:hover { background: #73d13d; }
+        .btn-warning { background: var(--warning); color: #fff; }
+        .btn-warning:hover { background: #ffc53d; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger:hover { background: #ff7875; }
+        .btn-default { background: #fff; border: 1px solid var(--border-color); color: var(--text-color); }
+        .btn-default:hover { border-color: var(--primary); color: var(--primary); }
+        table { width: 100%; border-collapse: collapse; }
+        table th, table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        table th { background: #fafafa; font-weight: 600; color: var(--text-secondary); }
+        table tr:hover { background: #f5f5f5; }
+        .pagination { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 24px; }
+        .pagination button { padding: 6px 12px; border: 1px solid var(--border-color); background: #fff; border-radius: 4px; cursor: pointer; }
+        .pagination button:hover { border-color: var(--primary); color: var(--primary); }
+        .pagination button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: #fff; border-radius: 8px; width: 600px; max-height: 80vh; overflow-y: auto; animation: modalIn 0.3s; }
+        @keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { padding: 16px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 18px; font-weight: 600; }
+        .modal-header .close { cursor: pointer; font-size: 24px; color: var(--text-secondary); }
+        .modal-body { padding: 24px; }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 12px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-secondary); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 4px; outline: none; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .risk-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .risk-green { background: #f6ffed; color: #52c41a; }
+        .risk-yellow { background: #fffff0; color: #faad14; }
+        .risk-orange { background: #fff7e6; color: #fa8c16; }
+        .risk-red { background: #fff2f0; color: #ff4d4f; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .status-pending { background: #e6f7ff; color: #1890ff; }
+        .status-active, .status-enrolled, .status-approved, .status-achieved { background: #f6ffed; color: #52c41a; }
+        .status-graduated, .status-resolved { background: #f9f0ff; color: #722ed1; }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+        .empty-state svg { width: 80px; height: 80px; margin-bottom: 16px; opacity: 0.5; }
+        .action-btns { display: flex; gap: 8px; }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 24px; border-radius: 4px; color: #fff; z-index: 2000; animation: toastIn 0.3s; }
+        .toast-success { background: var(--success); }
+        .toast-error { background: var(--danger); }
+        @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .submenu { display: none; background: rgba(0,0,0,0.1); }
+        .submenu.show { display: block; }
+        .submenu-item { padding: 10px 20px 10px 48px; cursor: pointer; }
+        .submenu-item:hover { background: rgba(24,144,255,0.3); }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="logo">教育服务系统</div>
+            <div class="menu" id="menu"></div>
+        </div>
+        <div class="main">
+            <div class="header">
+                <div class="breadcrumb" id="breadcrumb">首页</div>
+                <div class="user-info">
+                    <span id="username">Admin</span>
+                    <div class="avatar" id="userAvatar">A</div>
+                    <button class="btn btn-default" onclick="logout()">退出</button>
+                </div>
+            </div>
+            <div class="content" id="content"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">新增</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" id="modalSubmit">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let token = localStorage.getItem('token');
+        let currentModule = '';
+        let currentData = [];
+        let currentPage = 1;
+        let pageSize = 10;
+        let searchParams = {};
+
+        const MENU_CONFIG = {
+            '系统管理': [
+                { id: 'user_permissions', name: '用户权限', icon: '&#128100;' },
+                { id: 'employees', name: '员工信息', icon: '&#128188;' },
+                { id: 'clients', name: '客户信息', icon: '&#128101;' }
+            ],
+            '教学管理': [
+                { id: 'students', name: '学生信息', icon: '&#128104;' },
+                { id: 'classes', name: '班级信息', icon: '&#128218;' },
+                { id: 'exams', name: '考试信息', icon: '&#128221;' },
+                { id: 'training_courses', name: '培训课程', icon: '&#128218;' },
+                { id: 'student_face_records', name: '人脸识别', icon: '&#128515;' }
+            ],
+            '学生关怀': [
+                { id: 'student_leaves', name: '学生请假', icon: '&#128222;' },
+                { id: 'student_complaints', name: '投诉建议', icon: '&#128172;' },
+                { id: 'student_chat_logs', name: '聊天记录', icon: '&#128172;' },
+                { id: 'student_photos', name: '人脸心情', icon: '&#128248;' }
+            ],
+            '运营管理': [
+                { id: 'daily_reports', name: '日常工作', icon: '&#128221;' },
+                { id: 'monthly_goals', name: '月度目标', icon: '&#127942;' },
+                { id: 'sales_results', name: '销售业绩', icon: '&#128176;' }
+            ],
+            '知识库': [
+                { id: 'faq', name: 'FAQ问答', icon: '&#128169;' },
+                { id: 'global_study_policies', name: '留学政策', icon: '&#127757;' },
+                { id: 'study_agency_info', name: '留学机构', icon: '&#127973;' },
+                { id: 'knowledge_base_overseas', name: '海外生活', icon: '&#9992;' }
+            ],
+            '活动管理': [
+                { id: 'activity_info', name: '活动信息', icon: '&#127942;' },
+                { id: 'activity_bookings', name: '活动报名', icon: '&#128221;' }
+            ]
+        };
+
+        const MODULE_CONFIG = {
+            'user_permissions': { title: '用户权限', fields: ['user_id', 'username', 'role', 'created_at'], createFields: ['username', 'password', 'role'], updateFields: ['username', 'password', 'role'] },
+            'employees': { title: '员工信息', fields: ['employee_id', 'name', 'gender', 'phone', 'position', 'hire_date', 'status'], createFields: ['name', 'gender', 'phone', 'email', 'position', 'hire_date', 'department'], updateFields: ['name', 'gender', 'phone', 'email', 'position', 'department', 'status'] },
+            'clients': { title: '客户信息', fields: ['client_id', 'name', 'phone', 'email', 'interest_country', 'status'], createFields: ['name', 'gender', 'phone', 'email', 'interest_country'], updateFields: ['name', 'gender', 'phone', 'email', 'interest_country', 'status'] },
+            'students': { title: '学生信息', fields: ['student_id', 'name', 'gender', 'dob', 'class_id', 'email', 'parent_contact', 'enrollment_date', 'status'], createFields: ['name', 'gender', 'dob', 'class_id', 'email', 'parent_contact', 'enrollment_date'], updateFields: ['name', 'gender', 'dob', 'class_id', 'email', 'parent_contact', 'enrollment_date', 'status'] },
+            'classes': { title: '班级信息', fields: ['class_id', 'class_name', 'grade_level', 'head_teacher_id', 'classroom_location', 'max_students', 'current_students', 'status'], createFields: ['class_name', 'grade_level', 'head_teacher_id', 'classroom_location', 'max_students'], updateFields: ['class_name', 'grade_level', 'head_teacher_id', 'classroom_location', 'max_students', 'current_students', 'status'] },
+            'exams': { title: '考试信息', fields: ['exam_id', 'class_name', 'subject', 'exam_name', 'exam_time', 'location'], createFields: ['class_name', 'subject', 'exam_name', 'exam_time', 'location'], updateFields: ['class_name', 'subject', 'exam_name', 'exam_time', 'location'] },
+            'training_courses': { title: '培训课程', fields: ['course_id', 'course_name', 'subject', 'teacher_id', 'start_date', 'end_date', 'max_students', 'status'], createFields: ['course_name', 'subject', 'teacher_id', 'class_id', 'start_date', 'end_date', 'max_students', 'fee'], updateFields: ['course_name', 'subject', 'teacher_id', 'class_id', 'start_date', 'end_date', 'max_students', 'fee', 'status'] },
+            'student_face_records': { title: '学生人脸识别', fields: ['face_id', 'student_id', 'photo_url', 'created_at'], createFields: ['student_id', 'face_feature_data', 'photo_url'], updateFields: ['face_feature_data', 'photo_url'] },
+            'student_leaves': { title: '学生请假', fields: ['leave_id', 'student_id', 'start_time', 'end_time', 'reason', 'status', 'approver_id'], createFields: ['student_id', 'start_time', 'end_time', 'reason', 'approver_id'], updateFields: ['status', 'resolve_remark'] },
+            'student_complaints': { title: '学生投诉建议', fields: ['complaint_id', 'student_id', 'content', 'type', 'status', 'handler_id', 'created_at'], createFields: ['student_id', 'content', 'type', 'handler_id'], updateFields: ['status', 'resolve_remark'] },
+            'student_chat_logs': { title: '学生聊天记录', fields: ['log_id', 'student_id', 'message_text', 'sentiment_score', 'risk_level', 'keywords_detected', 'created_at'], createFields: ['student_id', 'message_text', 'sentiment_score', 'risk_level', 'keywords_detected'], updateFields: ['message_text', 'sentiment_score', 'risk_level', 'keywords_detected'] },
+            'student_photos': { title: '学生人脸心情', fields: ['photo_id', 'student_id', 'photo_url', 'mood_status', 'risk_level', 'sentiment_score', 'capture_scene', 'device_id', 'created_at'], createFields: ['student_id', 'photo_url', 'mood_status', 'risk_level', 'sentiment_score', 'capture_scene', 'device_id'], updateFields: ['mood_status', 'risk_level', 'sentiment_score', 'capture_scene', 'device_id'] },
+            'daily_reports': { title: '日常工作', fields: ['report_id', 'employee_id', 'report_date', 'content', 'work_hours'], createFields: ['employee_id', 'report_date', 'content', 'work_hours'], updateFields: ['content', 'work_hours'] },
+            'monthly_goals': { title: '月度目标', fields: ['goal_id', 'employee_id', 'target_month', 'target_amount', 'actual_amount', 'achievement_rate', 'status'], createFields: ['employee_id', 'target_month', 'target_amount', 'actual_amount', 'achievement_rate', 'status'], updateFields: ['actual_amount', 'achievement_rate', 'status'] },
+            'sales_results': { title: '销售业绩', fields: ['result_id', 'employee_id', 'sale_date', 'sale_amount', 'product_name', 'customer_name'], createFields: ['employee_id', 'sale_date', 'sale_amount', 'product_name', 'customer_name'], updateFields: ['sale_amount', 'product_name', 'customer_name'] },
+            'faq': { title: 'FAQ问答', fields: ['faq_id', 'question', 'answer', 'category', 'created_at'], createFields: ['question', 'answer', 'category'], updateFields: ['question', 'answer', 'category'] },
+            'global_study_policies': { title: '留学政策', fields: ['policy_id', 'country', 'policy_type', 'title', 'impact_level', 'effective_date'], createFields: ['country', 'policy_type', 'title', 'content', 'impact_level', 'effective_date'], updateFields: ['title', 'content', 'impact_level', 'effective_date'] },
+            'study_agency_info': { title: '留学机构', fields: ['agency_id', 'agency_name', 'country', 'cooperation_type', 'status'], createFields: ['agency_name', 'country', 'contact_person', 'contact_phone', 'cooperation_type'], updateFields: ['contact_person', 'contact_phone', 'cooperation_type', 'status'] },
+            'knowledge_base_overseas': { title: '海外生活知识库', fields: ['kb_id', 'country', 'category', 'question', 'answer', 'keywords', 'created_at'], createFields: ['country', 'category', 'question', 'answer', 'keywords'], updateFields: ['country', 'category', 'question', 'answer', 'keywords'] },
+            'activity_info': { title: '活动信息', fields: ['activity_id', 'activity_name', 'activity_type', 'start_time', 'end_time', 'location', 'max_participants', 'status'], createFields: ['activity_name', 'activity_type', 'description', 'start_time', 'end_time', 'location', 'max_participants'], updateFields: ['activity_name', 'activity_type', 'description', 'start_time', 'end_time', 'location', 'max_participants', 'status'] },
+            'activity_bookings': { title: '活动报名', fields: ['booking_id', 'activity_id', 'client_id', 'booking_time', 'status'], createFields: ['activity_id', 'client_id'], updateFields: ['status', 'check_in_status'] }
+        };
+
+        const FIELD_LABELS = {
+            'user_id': '用户ID', 'username': '用户名', 'password': '密码', 'role': '角色', 'created_at': '创建时间',
+            'employee_id': '员工ID', 'name': '姓名', 'gender': '性别', 'phone': '电话', 'email': '邮箱', 'position': '职位', 'hire_date': '入职日期', 'department': '部门', 'status': '状态',
+            'client_id': '客户ID', 'interest_country': '意向国家',
+            'student_id': '学生ID', 'dob': '出生日期', 'class_id': '班级ID', 'parent_contact': '家长联系方式', 'enrollment_date': '入学日期',
+            'class_name': '班级名称', 'grade_level': '年级', 'head_teacher_id': '班主任ID', 'classroom_location': '教室位置', 'max_students': '最大人数', 'current_students': '当前人数',
+            'exam_id': '考试ID', 'subject': '科目', 'exam_name': '考试名称', 'exam_time': '考试时间', 'location': '地点',
+            'course_id': '课程ID', 'course_name': '课程名称', 'teacher_id': '教师ID', 'start_date': '开始日期', 'end_date': '结束日期', 'fee': '费用',
+            'face_id': '人脸ID', 'face_feature_data': '人脸特征', 'photo_url': '照片URL',
+            'leave_id': '请假ID', 'start_time': '开始时间', 'end_time': '结束时间', 'reason': '原因', 'approver_id': '审批人ID', 'resolve_remark': '处理备注',
+            'complaint_id': '投诉ID', 'content': '内容', 'type': '类型',
+            'log_id': '日志ID', 'message_text': '聊天内容', 'sentiment_score': '情绪评分', 'risk_level': '风险等级', 'keywords_detected': '敏感词',
+            'photo_id': '照片ID', 'mood_status': '心情状态', 'capture_scene': '抓拍场景', 'device_id': '设备ID',
+            'report_id': '日报ID', 'report_date': '日报日期', 'work_hours': '工作时长',
+            'goal_id': '目标ID', 'target_month': '目标月份', 'target_amount': '目标金额', 'actual_amount': '实际金额', 'achievement_rate': '完成率',
+            'result_id': '业绩ID', 'sale_date': '销售日期', 'sale_amount': '销售金额', 'product_name': '产品名称', 'customer_name': '客户姓名',
+            'faq_id': 'FAQ ID', 'question': '问题', 'answer': '答案', 'category': '分类',
+            'policy_id': '政策ID', 'country': '国家', 'policy_type': '政策类型', 'title': '标题', 'impact_level': '影响级别', 'effective_date': '生效日期',
+            'agency_id': '机构ID', 'agency_name': '机构名称', 'contact_person': '联系人', 'contact_phone': '联系电话', 'cooperation_type': '合作类型',
+            'kb_id': '知识ID', 'keywords': '关键词',
+            'activity_id': '活动ID', 'activity_name': '活动名称', 'activity_type': '活动类型', 'description': '描述', 'max_participants': '最大参与人数',
+            'booking_id': '报名ID', 'booking_time': '报名时间', 'check_in_status': '签到状态'
+        };
+
+        const SELECT_FIELDS = {
+            'role': ['admin', 'employee', 'student', 'teacher'],
+            'gender': ['M', 'F'],
+            'status': ['active', 'inactive', 'pending', 'approved', 'rejected', 'resolved', 'achieved', 'failed', 'enrolled', 'graduated', 'withdrawn', 'graduated', 'disbanded'],
+            'type': ['complaints', 'suggestions'],
+            'risk_level': ['green', 'yellow', 'orange', 'red'],
+            'impact_level': ['low', 'medium', 'high'],
+            'cooperation_type': ['direct', 'agent', 'franchise'],
+            'activity_type': ['seminar', 'workshop', 'social', 'cultural'],
+            'mood_status': ['开心', '平静', '焦虑', '愤怒', '悲伤']
+        };
+
+        function initMenu() {
+            const menu = document.getElementById('menu');
+            for (const [group, items] of Object.entries(MENU_CONFIG)) {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'menu-item';
+                groupDiv.innerHTML = `${group} <span style="margin-left:auto">▼</span>`;
+                groupDiv.onclick = () => {
+                    const submenu = groupDiv.nextElementSibling;
+                    submenu.classList.toggle('show');
+                };
+                menu.appendChild(groupDiv);
+                const submenu = document.createElement('div');
+                submenu.className = 'submenu';
+                items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'submenu-item';
+                    itemDiv.innerHTML = `<span>${item.icon}</span> ${item.name}`;
+                    itemDiv.onclick = () => loadModule(item.id);
+                    submenu.appendChild(itemDiv);
+                });
+                menu.appendChild(submenu);
+            }
+        }
+
+        async function loadModule(moduleId) {
+            if (!token) { location.href = 'login.html'; return; }
+            currentModule = moduleId;
+            const config = MODULE_CONFIG[moduleId];
+            if (!config) return;
+            document.getElementById('breadcrumb').textContent = config.title;
+            renderPage(moduleId, config);
+        }
+
+        function renderPage(moduleId, config) {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="page-header">
+                    <h2 class="page-title">${config.title}</h2>
+                    <button class="btn btn-primary" onclick="openCreateModal()">+ 新增</button>
+                </div>
+                <div class="card">
+                    <div class="search-form" id="searchForm"></div>
+                    <table>
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                    <div class="empty-state hidden" id="emptyState">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                        <p>暂无数据</p>
+                    </div>
+                    <div class="pagination" id="pagination"></div>
+                </div>
+            `;
+            renderSearchForm(config);
+            renderTable(config);
+            fetchData(moduleId);
+        }
+
+        function renderSearchForm(config) {
+            const searchForm = document.getElementById('searchForm');
+            const filterFields = config.fields.filter(f => !['created_at', 'updated_at'].includes(f)).slice(0, 5);
+            filterFields.forEach(field => {
+                if (SELECT_FIELDS[field]) {
+                    searchForm.innerHTML += `<div class="form-item"><label>${FIELD_LABELS[field]}</label><select id="search_${field}"><option value="">全部</option>${SELECT_FIELDS[field].map(v => `<option value="${v}">${v}</option>`).join('')}</select></div>`;
+                } else {
+                    searchForm.innerHTML += `<div class="form-item"><label>${FIELD_LABELS[field]}</label><input type="text" id="search_${field}" placeholder="请输入"></div>`;
+                }
+            });
+            searchForm.innerHTML += `<button class="btn btn-primary" onclick="search()">查询</button><button class="btn btn-default" onclick="resetSearch()">重置</button>`;
+        }
+
+        function renderTable(config) {
+            const tableHead = document.getElementById('tableHead');
+            tableHead.innerHTML = `<tr>${config.fields.map(f => `<th>${FIELD_LABELS[f] || f}</th>`).join('')}<th>操作</th></tr>`;
+        }
+
+        async function fetchData(moduleId, page = 1, params = {}) {
+            const queryParams = new URLSearchParams({ page, page_size: pageSize, ...params });
+            try {
+                const res = await fetch(`${API_BASE}/${moduleId}/page?${queryParams}`, { headers: getHeaders() });
+                const data = await res.json();
+                currentData = data.items || [];
+                currentPage = data.page;
+                renderTableData(data.items || [], data.total, data.page, data.total_pages, moduleId);
+            } catch (e) {
+                showToast('获取数据失败', 'error');
+            }
+        }
+
+        function renderTableData(items, total, page, totalPages, moduleId) {
+            const tableBody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            if (!items.length) { tableBody.innerHTML = ''; emptyState.classList.remove('hidden'); return; }
+            emptyState.classList.add('hidden');
+            const config = MODULE_CONFIG[moduleId];
+            tableBody.innerHTML = items.map(item => {
+                const idField = moduleId.replace('_s', '_').replace('_records', '_record').replace(/_/g, '_') + '_id';
+                const idValue = item[Object.keys(item).find(k => k.endsWith('_id') && !k.startsWith('head_') && !k.startsWith('approver') && !k.startsWith('handler') && !k.startsWith('teacher') && !k.startsWith('client') && !k.startsWith('employee'))] || item[Object.keys(item).find(k => k.endsWith('_id'))];
+                return `<tr>${config.fields.map(f => {
+                    let value = item[f];
+                    if (f === 'risk_level') return `<td><span class="risk-badge risk-${value}">${value}</span></td>`;
+                    if (f === 'status') return `<td><span class="status-badge status-${value}">${value}</span></td>`;
+                    if (f === 'sentiment_score' && value !== null) return `<td>${Number(value).toFixed(2)}</td>`;
+                    if (value === null || value === undefined) return '<td>-</td>';
+                    return `<td>${value}</td>`;
+                }).join('')}<td class="action-btns"><button class="btn btn-warning" onclick="openEditModal('${idValue}')">编辑</button><button class="btn btn-danger" onclick="deleteItem('${idValue}')">删除</button></td></tr>`;
+            }).join('');
+            renderPagination(total, page, totalPages);
+        }
+
+        function renderPagination(total, page, totalPages) {
+            const pagination = document.getElementById('pagination');
+            let html = `<button ${page <= 1 ? 'disabled' : ''} onclick="goPage(${page - 1})">上一页</button>`;
+            for (let i = 1; i <= Math.min(totalPages, 5); i++) html += `<button class="${i === page ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+            html += `<button ${page >= totalPages ? 'disabled' : ''} onclick="goPage(${page + 1})">下一页</button>`;
+            html += `<span style="margin-left:12px">共 ${total} 条</span>`;
+            pagination.innerHTML = html;
+        }
+
+        function goPage(p) { search(p); }
+
+        function search(page = 1) {
+            searchParams = {};
+            const inputs = document.querySelectorAll('#searchForm input, #searchForm select');
+            inputs.forEach(input => { if (input.value) searchParams[input.id.replace('search_', '')] = input.value; });
+            fetchData(currentModule, page, searchParams);
+        }
+
+        function resetSearch() {
+            const inputs = document.querySelectorAll('#searchForm input, #searchForm select');
+            inputs.forEach(input => input.value = '');
+            fetchData(currentModule);
+        }
+
+        function openCreateModal() {
+            const config = MODULE_CONFIG[currentModule];
+            document.getElementById('modalTitle').textContent = `新增 ${config.title}`;
+            document.getElementById('modalBody').innerHTML = config.createFields.map(f => {
+                const label = FIELD_LABELS[f] || f;
+                if (SELECT_FIELDS[f]) return `<div class="form-group"><label>${label}</label><select id="field_${f}">${SELECT_FIELDS[f].map(v => `<option value="${v}">${v}</option>`).join('')}</select></div>`;
+                const type = f.includes('date') || f.includes('time') ? 'datetime-local' : 'text';
+                return `<div class="form-group"><label>${label}</label><input type="${type}" id="field_${f}" ${f === 'student_id' || f === 'employee_id' || f === 'class_id' || f === 'approver_id' || f === 'handler_id' || f === 'teacher_id' || f === 'client_id' || f === 'activity_id' ? 'type="number"' : ''}></div>`;
+            }).join('');
+            document.getElementById('modalSubmit').onclick = createItem;
+            document.getElementById('modal').classList.add('show');
+        }
+
+        async function openEditModal(id) {
+            const res = await fetch(`${API_BASE}/${currentModule}/${id}`, { headers: getHeaders() });
+            if (!res.ok) { showToast('获取详情失败', 'error'); return; }
+            const item = await res.json();
+            const config = MODULE_CONFIG[currentModule];
+            document.getElementById('modalTitle').textContent = `编辑 ${config.title}`;
+            document.getElementById('modalBody').innerHTML = config.updateFields.map(f => {
+                const label = FIELD_LABELS[f] || f;
+                let value = item[f] || '';
+                if (f.includes('time') || f.includes('date')) value = value ? value.replace('Z', '').substring(0, 16) : '';
+                if (SELECT_FIELDS[f]) return `<div class="form-group"><label>${label}</label><select id="field_${f}">${SELECT_FIELDS[f].map(v => `<option value="${v}" ${v === value ? 'selected' : ''}>${v}</option>`).join('')}</select></div>`;
+                return `<div class="form-group"><label>${label}</label><input type="text" id="field_${f}" value="${value}"></div>`;
+            }).join('');
+            document.getElementById('modalSubmit').onclick = () => updateItem(id);
+            document.getElementById('modal').classList.add('show');
+        }
+
+        async function createItem() {
+            const config = MODULE_CONFIG[currentModule];
+            const data = {};
+            config.createFields.forEach(f => {
+                const el = document.getElementById(`field_${f}`);
+                if (el) data[f] = el.value;
+            });
+            try {
+                const res = await fetch(`${API_BASE}/${currentModule}`, { method: 'POST', headers: getHeaders('application/json'), body: JSON.stringify(data) });
+                if (res.ok) { showToast('创建成功', 'success'); closeModal(); fetchData(currentModule); }
+                else { const err = await res.json(); showToast(err.detail || '创建失败', 'error'); }
+            } catch (e) { showToast('创建失败', 'error'); }
+        }
+
+        async function updateItem(id) {
+            const config = MODULE_CONFIG[currentModule];
+            const data = {};
+            config.updateFields.forEach(f => {
+                const el = document.getElementById(`field_${f}`);
+                if (el) data[f] = el.value;
+            });
+            try {
+                const res = await fetch(`${API_BASE}/${currentModule}/${id}`, { method: 'PUT', headers: getHeaders('application/json'), body: JSON.stringify(data) });
+                if (res.ok) { showToast('更新成功', 'success'); closeModal(); fetchData(currentModule); }
+                else { const err = await res.json(); showToast(err.detail || '更新失败', 'error'); }
+            } catch (e) { showToast('更新失败', 'error'); }
+        }
+
+        async function deleteItem(id) {
+            if (!confirm('确定要删除吗？')) return;
+            try {
+                const res = await fetch(`${API_BASE}/${currentModule}/${id}`, { method: 'DELETE', headers: getHeaders() });
+                if (res.ok) { showToast('删除成功', 'success'); fetchData(currentModule); }
+                else { const err = await res.json(); showToast(err.detail || '删除失败', 'error'); }
+            } catch (e) { showToast('删除失败', 'error'); }
+        }
+
+        function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+        function getHeaders(contentType = 'application/json') {
+            const headers = { 'Authorization': `Bearer ${token}` };
+            if (contentType) headers['Content-Type'] = contentType;
+            return headers;
+        }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            location.href = 'login.html';
+        }
+
+        initMenu();
+        if (!token) location.href = 'login.html';
+        else { const user = JSON.parse(localStorage.getItem('user') || '{}'); document.getElementById('username').textContent = user.username || 'Admin'; document.getElementById('userAvatar').textContent = (user.username || 'A')[0].toUpperCase(); }
+    </script>
+</body>
+</html>

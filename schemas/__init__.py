@@ -17,5 +17,6 @@ from schemas.student_complaints import StudentComplaintCreate, StudentComplaintU
 from schemas.student_chat_logs import StudentChatLogCreate, StudentChatLogUpdate, StudentChatLogResponse, StudentChatLogPageResponse, RiskLevelEnum
 from schemas.student_photos import StudentPhotoCreate, StudentPhotoUpdate, StudentPhotoResponse, StudentPhotoPageResponse, PhotoRiskLevelEnum
 from schemas.exams import ExamCreate, ExamUpdate, ExamResponse, ExamPageResponse
+from schemas.student_grades import StudentGradeCreate, StudentGradeUpdate, StudentGradeResponse, StudentGradePageResponse
 from schemas.knowledge_base_overseas import KnowledgeBaseOverseasCreate, KnowledgeBaseOverseasUpdate, KnowledgeBaseOverseasResponse, KnowledgeBaseOverseasPageResponse
 from schemas.classes import ClassCreate, ClassUpdate, ClassResponse, ClassPageResponse

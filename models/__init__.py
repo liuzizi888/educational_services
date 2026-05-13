@@ -17,5 +17,6 @@ from models.student_complaints import StudentComplaints
 from models.student_chat_logs import StudentChatLogs
 from models.student_photos import StudentPhotos
 from models.exams import Exams
+from models.student_grades import StudentGrades
 from models.knowledge_base_overseas import KnowledgeBaseOverseas
 from models.classes import Classes

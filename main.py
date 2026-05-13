@@ -25,13 +25,14 @@ from api.student_complaints_api import router as student_complaints_router
 from api.student_chat_logs_api import router as student_chat_logs_router
 from api.student_photos_api import router as student_photos_router
 from api.exams_api import router as exams_router
+from api.student_grades_api import router as student_grades_router
 from api.knowledge_base_overseas_api import router as knowledge_base_overseas_router
 from api.classes_api import router as classes_router
 
 load_dotenv()
 
 # 从环境变量读取配置
-HOST = os.getenv('HOST', 'localhost')
+HOST = os.getenv('HOST', '0.0.0.0')
 PORT = int(os.getenv('PORT', '8888'))
 FRONTEND_DIR = os.getenv('FRONTEND_DIR', 'frontend')
 LOG_DIR = os.getenv('LOG_DIR', 'log')
@@ -64,6 +65,7 @@ app.include_router(student_complaints_router, prefix="/student_complaints")
 app.include_router(student_chat_logs_router, prefix="/student_chat_logs")
 app.include_router(student_photos_router, prefix="/student_photos")
 app.include_router(exams_router, prefix="/exams")
+app.include_router(student_grades_router, prefix="/student_grades")
 app.include_router(knowledge_base_overseas_router, prefix="/knowledge_base_overseas")
 app.include_router(classes_router, prefix="/classes")
 

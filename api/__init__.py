@@ -17,5 +17,6 @@ from api.student_complaints_api import router as student_complaints_router
 from api.student_chat_logs_api import router as student_chat_logs_router
 from api.student_photos_api import router as student_photos_router
 from api.exams_api import router as exams_router
+from api.student_grades_api import router as student_grades_router
 from api.knowledge_base_overseas_api import router as knowledge_base_overseas_router
 from api.classes_api import router as classes_router

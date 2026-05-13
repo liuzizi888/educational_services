@@ -149,6 +149,7 @@
                 { id: 'students', name: '学生信息', icon: '&#128104;' },
                 { id: 'classes', name: '班级信息', icon: '&#128218;' },
                 { id: 'exams', name: '考试信息', icon: '&#128221;' },
+                { id: 'student_grades', name: '学生成绩', icon: '&#128221;' },
                 { id: 'training_courses', name: '培训课程', icon: '&#128218;' },
                 { id: 'student_face_records', name: '人脸识别', icon: '&#128515;' }
             ],
@@ -182,6 +183,7 @@
             'students': { title: '学生信息', fields: ['student_id', 'name', 'gender', 'dob', 'class_id', 'email', 'parent_contact', 'enrollment_date', 'status'], createFields: ['name', 'gender', 'dob', 'class_id', 'email', 'parent_contact', 'enrollment_date'], updateFields: ['name', 'gender', 'dob', 'class_id', 'email', 'parent_contact', 'enrollment_date', 'status'] },
             'classes': { title: '班级信息', fields: ['class_id', 'class_name', 'grade_level', 'head_teacher_id', 'classroom_location', 'max_students', 'current_students', 'status'], createFields: ['class_name', 'grade_level', 'head_teacher_id', 'classroom_location', 'max_students'], updateFields: ['class_name', 'grade_level', 'head_teacher_id', 'classroom_location', 'max_students', 'current_students', 'status'] },
             'exams': { title: '考试信息', fields: ['exam_id', 'class_name', 'subject', 'exam_name', 'exam_time', 'location'], createFields: ['class_name', 'subject', 'exam_name', 'exam_time', 'location'], updateFields: ['class_name', 'subject', 'exam_name', 'exam_time', 'location'] },
+            'student_grades': { title: '学生成绩', fields: ['grade_id', 'student_id', 'subject', 'score', 'exam_type', 'exam_date', 'teacher_remark'], createFields: ['student_id', 'subject', 'score', 'exam_type', 'exam_date', 'teacher_remark'], updateFields: ['student_id', 'subject', 'score', 'exam_type', 'exam_date', 'teacher_remark'] },
             'training_courses': { title: '培训课程', fields: ['course_id', 'course_name', 'subject', 'teacher_id', 'start_date', 'end_date', 'max_students', 'status'], createFields: ['course_name', 'subject', 'teacher_id', 'class_id', 'start_date', 'end_date', 'max_students', 'fee'], updateFields: ['course_name', 'subject', 'teacher_id', 'class_id', 'start_date', 'end_date', 'max_students', 'fee', 'status'] },
             'student_face_records': { title: '学生人脸识别', fields: ['face_id', 'student_id', 'photo_url', 'created_at'], createFields: ['student_id', 'face_feature_data', 'photo_url'], updateFields: ['face_feature_data', 'photo_url'] },
             'student_leaves': { title: '学生请假', fields: ['leave_id', 'student_id', 'start_time', 'end_time', 'reason', 'status', 'approver_id'], createFields: ['student_id', 'start_time', 'end_time', 'reason', 'approver_id'], updateFields: ['status', 'resolve_remark'] },
@@ -206,6 +208,7 @@
             'student_id': '学生ID', 'dob': '出生日期', 'class_id': '班级ID', 'parent_contact': '家长联系方式', 'enrollment_date': '入学日期',
             'class_name': '班级名称', 'grade_level': '年级', 'head_teacher_id': '班主任ID', 'classroom_location': '教室位置', 'max_students': '最大人数', 'current_students': '当前人数',
             'exam_id': '考试ID', 'subject': '科目', 'exam_name': '考试名称', 'exam_time': '考试时间', 'location': '地点',
+            'grade_id': '成绩ID', 'score': '分数', 'exam_type': '考试类型', 'exam_date': '考试日期', 'teacher_remark': '教师评语',
             'course_id': '课程ID', 'course_name': '课程名称', 'teacher_id': '教师ID', 'start_date': '开始日期', 'end_date': '结束日期', 'fee': '费用',
             'face_id': '人脸ID', 'face_feature_data': '人脸特征', 'photo_url': '照片URL',
             'leave_id': '请假ID', 'start_time': '开始时间', 'end_time': '结束时间', 'reason': '原因', 'approver_id': '审批人ID', 'resolve_remark': '处理备注',

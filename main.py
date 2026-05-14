@@ -28,6 +28,7 @@ from api.exams_api import router as exams_router
 from api.student_grades_api import router as student_grades_router
 from api.knowledge_base_overseas_api import router as knowledge_base_overseas_router
 from api.classes_api import router as classes_router
+from api.dify_api import router as dify_router
 
 load_dotenv()
 
@@ -68,6 +69,7 @@ app.include_router(exams_router, prefix="/exams")
 app.include_router(student_grades_router, prefix="/student_grades")
 app.include_router(knowledge_base_overseas_router, prefix="/knowledge_base_overseas")
 app.include_router(classes_router, prefix="/classes")
+app.include_router(dify_router, prefix="/dify")
 
 
 #用来查看日志

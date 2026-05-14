@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from service.dify_service import DifyService
 
-router = APIRouter(tags=["dify_调用sql通用接口"])
+router = APIRouter(tags=["dify"])
 
 
 @router.get("/")

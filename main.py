@@ -29,6 +29,9 @@ from api.student_grades_api import router as student_grades_router
 from api.knowledge_base_overseas_api import router as knowledge_base_overseas_router
 from api.classes_api import router as classes_router
 from api.dify_api import router as dify_router
+from api.loc_push_api import router as loc_push_router
+from api.face_emotion_api import router as face_emotion_router
+from api.exam_trigger_api import router as exam_trigger_router
 
 load_dotenv()
 
@@ -70,6 +73,9 @@ app.include_router(student_grades_router, prefix="/student_grades")
 app.include_router(knowledge_base_overseas_router, prefix="/knowledge_base_overseas")
 app.include_router(classes_router, prefix="/classes")
 app.include_router(dify_router, prefix="/dify")
+app.include_router(loc_push_router, prefix="/loc_push")
+app.include_router(face_emotion_router, prefix="/face_emotion")
+app.include_router(exam_trigger_router, prefix="/exam_trigger")
 
 
 #用来查看日志

@@ -22,6 +22,9 @@ def create(obj: StudentPhotoCreate, db: Session = Depends(get_db)):
     return StudentPhotosService.create(db, obj)
 
 
+
+
+
 @router.get("/page", response_model=StudentPhotoPageResponse)
 def get_page(
     page: int = 1,

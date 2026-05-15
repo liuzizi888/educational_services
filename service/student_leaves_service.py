@@ -12,9 +12,6 @@ from schemas.student_leaves import (
 from typing import Optional
 
 
-VALID_STATUSES = {"pending", "approved", "rejected"}
-
-
 class StudentLeavesService:
     """学生请假服务层"""
 
@@ -22,10 +19,6 @@ class StudentLeavesService:
     def create(db: Session, obj: StudentLeaveCreate) -> StudentLeaveResponse:
         """创建学生请假"""
         obj_data = obj.model_dump()
-        # 过滤无效的status值
-        status = obj_data.get("status")
-        if not status or status not in VALID_STATUSES:
-            obj_data["status"] = "pending"
         leave = StudentLeavesDAO.create(db, obj_data)
         return StudentLeaveResponse.model_validate(leave)
 
@@ -53,9 +46,6 @@ class StudentLeavesService:
     def update(db: Session, leave_id: int, obj: StudentLeaveUpdate) -> Optional[StudentLeaveResponse]:
         """更新学生请假"""
         update_data = obj.model_dump(exclude_unset=True)
-        # 过滤无效的status值
-        if "status" in update_data and update_data["status"] not in VALID_STATUSES:
-            del update_data["status"]
         leave = StudentLeavesDAO.update(db, leave_id, update_data)
         if leave:
             return StudentLeaveResponse.model_validate(leave)

@@ -19,6 +19,9 @@ class StudentLeavesService:
     def create(db: Session, obj: StudentLeaveCreate) -> StudentLeaveResponse:
         """创建学生请假"""
         obj_data = obj.model_dump()
+        # 默认状态为 pending
+        if not obj_data.get('status'):
+            obj_data['status'] = 'pending'
         leave = StudentLeavesDAO.create(db, obj_data)
         return StudentLeaveResponse.model_validate(leave)
 

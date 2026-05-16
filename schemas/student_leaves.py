@@ -4,6 +4,14 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
+from enum import Enum
+
+
+class LeaveStatusEnum(str, Enum):
+    """请假状态枚举"""
+    pending = "pending"
+    approved = "approved"
+    rejected = "rejected"
 
 
 class StudentLeaveBase(BaseModel):
@@ -12,7 +20,7 @@ class StudentLeaveBase(BaseModel):
     start_time: Optional[datetime] = Field(None, description='请假开始时间')
     end_time: Optional[datetime] = Field(None, description='请假结束时间')
     reason: Optional[str] = Field(None, description='请假原因')
-    status: Optional[str] = Field(None, description='审批状态: pending-待审批, approved-已通过, rejected-已拒绝')
+    status: Optional[LeaveStatusEnum] = Field(None, description='审批状态: pending-待审批, approved-已通过, rejected-已拒绝')
     approver_id: Optional[int] = Field(None, description='审批人ID（逻辑外键）')
 
 
@@ -27,7 +35,7 @@ class StudentLeaveUpdate(BaseModel):
     start_time: Optional[datetime] = Field(None, description='请假开始时间')
     end_time: Optional[datetime] = Field(None, description='请假结束时间')
     reason: Optional[str] = Field(None, description='请假原因')
-    status: Optional[str] = Field(None, description='审批状态: pending-待审批, approved-已通过, rejected-已拒绝')
+    status: Optional[LeaveStatusEnum] = Field(None, description='审批状态: pending-待审批, approved-已通过, rejected-已拒绝')
     approver_id: Optional[int] = Field(None, description='审批人ID（逻辑外键）')
 
 
@@ -38,7 +46,7 @@ class StudentLeaveResponse(BaseModel):
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
     reason: Optional[str] = None
-    status: str
+    status: LeaveStatusEnum
     approver_id: Optional[int] = None
     is_deleted: int
     created_at: Optional[datetime] = None
